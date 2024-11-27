@@ -11,7 +11,7 @@ from flask_cors import CORS, cross_origin
 from trafficBase.model import CityModel
 from trafficBase.agent import Road, Traffic_Light,Obstacle, Destination, Car
 
-number_agents = 500
+number_agents = 10
 width = 28
 height = 28
 cityModel = None
@@ -28,7 +28,7 @@ def initModel():
     if request.method == 'POST':
         try:
 
-            number_agents = int(request.json.get(''))
+            number_agents = int(request.json.get('NAgents'))
             width = int(request.json.get('width'))
             height = int(request.json.get('height'))
             currentStep = 0

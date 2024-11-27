@@ -206,7 +206,7 @@ async function getRoads() {
 async function getDestination() {
     try {
 
-        let response = await fetch(agent_server_uri + "getDestinations")
+        let response = await fetch(agent_server_uri + "getDestination")
 
         if (response.ok){
             let result = await response.json()
@@ -345,7 +345,7 @@ function drawObstacles(distance, obstaclesVao, obstaclesBufferInfo, viewProjecti
         obstaculo.matrix = twgl.m4.rotateX(obstaculo.matrix, obstaculo.rotation[0]);
         obstaculo.matrix = twgl.m4.rotateY(obstaculo.matrix, obstaculo.rotation[1]);
         obstaculo.matrix = twgl.m4.rotateZ(obstaculo.matrix, obstaculo.rotation[2]);
-        obstaculo.matrix = twgl.m4.scale(viewProjectionMatrix, obstacle_scale);
+        obstaculo.matrix = twgl.m4.scale(obstaculo.matrix, obstacle_scale);
 
         let uniforms = {
             u_matrix: obstaculo.matrix
@@ -368,7 +368,7 @@ function drawRoads(distance, roadsVao, roadbufferInfo, viewProjectionMatrix){
         calle.matrix = twgl.m4.rotateX(calle.matrix, calle.rotation[0]);
         calle.matrix = twgl.m4.rotateY(calle.matrix, calle.rotation[1]);
         calle.matrix = twgl.m4.rotateZ(calle.matrix, calle.rotation[2]);
-        calle.matrix = twgl.m4.scale(viewProjectionMatrix, calle_scale);
+        calle.matrix = twgl.m4.scale(calle.matrix, calle_scale);
 
         let uniforms = {
             u_matrix: calle.matrix
@@ -388,10 +388,10 @@ function drawTrafficLight(distance, trafficLightVao, trafficLightBufferInfo, ){
         const semaforo_scale = twgl.v3.create(...semaforo.scale);
 
         semaforo.matrix = twgl.m4.translate(viewProjectionMatrix, semaforo_trans);
-        semaforo.matrix = twgl.m4.rotateX(calle.matrix, calle.rotation[0]);
-        semaforo.matrix = twgl.m4.rotateY(calle.matrix, calle.rotation[1]);
-        semaforo.matrix = twgl.m4.rotateZ(calle.matrix, calle.rotation[2]);
-        semaforo.matrix = twgl.m4.scale(viewProjectionMatrix, semaforo_scale);
+        semaforo.matrix = twgl.m4.rotateX(semaforo.matrix, calle.rotation[0]);
+        semaforo.matrix = twgl.m4.rotateY(semaforo.matrix, calle.rotation[1]);
+        semaforo.matrix = twgl.m4.rotateZ(semaforo.matrix, calle.rotation[2]);
+        semaforo.matrix = twgl.m4.scale(semaforo.matrix, semaforo_scale);
 
         let uniforms = {
             u_matrix: semaforo.matrix
@@ -411,10 +411,10 @@ function drawDestinations(distance, destinationVao, destinationBufferInfo, viewP
         const destino_scale = twgl.v3.create(...destino.scale);
 
         semaforo.matrix = twgl.m4.translate(viewProjectionMatrix, destino_trans);
-        semaforo.matrix = twgl.m4.rotateX(calle.matrix, calle.rotation[0]);
-        semaforo.matrix = twgl.m4.rotateY(calle.matrix, calle.rotation[1]);
-        semaforo.matrix = twgl.m4.rotateZ(calle.matrix, calle.rotation[2]);
-        semaforo.matrix = twgl.m4.scale(viewProjectionMatrix, destino_scale);
+        semaforo.matrix = twgl.m4.rotateX(destino.matrix, calle.rotation[0]);
+        semaforo.matrix = twgl.m4.rotateY(destino.matrix, calle.rotation[1]);
+        semaforo.matrix = twgl.m4.rotateZ(destino.matrix, calle.rotation[2]);
+        semaforo.matrix = twgl.m4.scale(destino.matrix, destino_scale);
 
         let uniforms = {
             u_matrix: destino.matrix
