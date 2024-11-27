@@ -40,7 +40,7 @@ class Objeto3D{
     }
 }
 
-const server_ui = "http://localhost:8585/";
+const agent_server_uri = "http://localhost:8585/";
 
 const carros = [];
 const obstaculos = [];
@@ -77,10 +77,10 @@ async function main(){
 
     //Data Generation
     carArrays = generateCarData(1); //debe hacerse
-    obstacleArrays = generateObstacleData(1); //debe hacerse
-    trafficLightArrays = generateTrafficLightData(1); //debe hacerse
-    roadArrays = generateRoadData(1); //debe hacerse
-    destinationArrays = generateDestinationData(1); //debe hacerse
+    obstacleArrays = generateData(1); //debe hacerse
+    trafficLightArrays = generateData(1); //debe hacerse
+    roadArrays = generateData(1); //debe hacerse
+    destinationArrays = generateData(1); //debe hacerse
 
     //Buffer Information
     carBufferInfo = twgl.createBufferInfoFromArrays(gl, carArrays);
@@ -475,7 +475,7 @@ function setupUI() {
         });
 }
 
-function generateObstacleData(size){
+function generateData(size){
 
     let arrays =
     {
@@ -568,5 +568,102 @@ function generateObstacleData(size){
     };
     return arrays;
 }
+
+function generateCarData(size){
+
+    let arrays =
+    {
+        a_position: {
+                numComponents: 3,
+                data: [
+                  // Front Face
+                  -0.5, -0.5,  0.5,
+                  0.5, -0.5,  0.5,
+                  0.5,  0.5,  0.5,
+                 -0.5,  0.5,  0.5,
+
+                 // Back face
+                 -0.5, -0.5, -0.5,
+                 -0.5,  0.5, -0.5,
+                  0.5,  0.5, -0.5,
+                  0.5, -0.5, -0.5,
+
+                 // Top face
+                 -0.5,  0.5, -0.5,
+                 -0.5,  0.5,  0.5,
+                  0.5,  0.5,  0.5,
+                  0.5,  0.5, -0.5,
+
+                 // Bottom face
+                 -0.5, -0.5, -0.5,
+                  0.5, -0.5, -0.5,
+                  0.5, -0.5,  0.5,
+                 -0.5, -0.5,  0.5,
+
+                 // Right face
+                  0.5, -0.5, -0.5,
+                  0.5,  0.5, -0.5,
+                  0.5,  0.5,  0.5,
+                  0.5, -0.5,  0.5,
+
+                 // Left face
+                 -0.5, -0.5, -0.5,
+                 -0.5, -0.5,  0.5,
+                 -0.5,  0.5,  0.5,
+                 -0.5,  0.5, -0.5
+                ].map(e => size * e)
+            },
+        a_color: {
+                numComponents: 4,
+                data: [
+                  // Front face
+                    0, 0, 0, 1, // v_1
+                    0, 0, 0, 1, // v_1
+                    0, 0, 0, 1, // v_1
+                    0, 0, 0, 1, // v_1
+                  // Back Face
+                    0.333, 0.333, 0.333, 1, // v_2
+                    0.333, 0.333, 0.333, 1, // v_2
+                    0.333, 0.333, 0.333, 1, // v_2
+                    0.333, 0.333, 0.333, 1, // v_2
+                  // Top Face
+                    0.5, 0.5, 0.5, 1, // v_3
+                    0.5, 0.5, 0.5, 1, // v_3
+                    0.5, 0.5, 0.5, 1, // v_3
+                    0.5, 0.5, 0.5, 1, // v_3
+                  // Bottom Face
+                    0.666, 0.666, 0.666, 1, // v_4
+                    0.666, 0.666, 0.666, 1, // v_4
+                    0.666, 0.666, 0.666, 1, // v_4
+                    0.666, 0.666, 0.666, 1, // v_4
+                  // Right Face
+                    0.833, 0.833, 0.833, 1, // v_5
+                    0.833, 0.833, 0.833, 1, // v_5
+                    0.833, 0.833, 0.833, 1, // v_5
+                    0.833, 0.833, 0.833, 1, // v_5
+                  // Left Face
+                    1, 1, 1, 1, // v_6
+                    1, 1, 1, 1, // v_6
+                    1, 1, 1, 1, // v_6
+                    1, 1, 1, 1, // v_6
+                ]
+            },
+        indices: {
+                numComponents: 3,
+                data: [
+                  0, 1, 2,      0, 2, 3,    // Front face
+                  4, 5, 6,      4, 6, 7,    // Back face
+                  8, 9, 10,     8, 10, 11,  // Top face
+                  12, 13, 14,   12, 14, 15, // Bottom face
+                  16, 17, 18,   16, 18, 19, // Right face
+                  20, 21, 22,   20, 22, 23  // Left face
+                ]
+            }
+    };
+    return arrays;
+}
+
+
+
 
 main()
