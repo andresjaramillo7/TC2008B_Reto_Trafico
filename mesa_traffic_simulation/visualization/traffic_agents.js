@@ -34,7 +34,7 @@ const Objects = {
     'building': {
         'model': {
             data: building, //must export
-            color: [1, 1, 1, 1],
+            color:[Math.random(), Math.random(), Math.random(), 1],
             shininess: 50,
         },
         'vao': undefined,
@@ -105,12 +105,12 @@ class Car{
 }
 
 class Building{
-    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,0.5]){
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,0.5], color = [Math.random(), Math.random(), Math.random(), 1]){
         this.id = id;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
-        this.color = Objects.building.model.color;
+        this.color = color;
         this.shininess = Objects.building.model.shininess;
         this.matrix = m4.identity();
     }
@@ -129,12 +129,12 @@ class Destination{
 }
 
 class TrafficLight{
-    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.1,0.1,0.1]){
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.1,0.1,0.1], color = [1,0,0,1]){
         this.id = id;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
-        this.color = Objects.traffic_light.model.color;
+        this.color = color;
         this.shininess = Objects.traffic_light.model.shininess;
         this.matrix = m4.identity();
     }
@@ -339,19 +339,27 @@ async function getTrafficLights() { //must check
 
                 semaforos = []
 
+                if (semaforos.length == 0){
                 for (const semaforo of result.positions){
+                    const color = semaforo.condition ? [0,1,0,1] : [1,0,0,1];
                     const newSemaforo = new TrafficLight (
                         semaforo.id,
                         [semaforo.x, semaforo.y, semaforo.z],
                         [0,0,0],
                         [0.2,0.2,0.2],
+                        color,
                     );
-                    newSemaforo.color = semaforo.state ? [0,1,0,1] : [1,0,0,1]
                     semaforos.push(newSemaforo)
                 } 
 
                 //console.log("Semaforos:", semaforos)
+            } else {
+                for (const agent of result.positions){
+                    const color = agent.condition ? [0,1,0,1] : [1,0,0,1];
+                    const current_semaforo = semaforos.find((TrafficLight) => TrafficLight.id == agent.id)
+                }
             } 
+        }
     } catch (error){
         console.log(error)
     }
