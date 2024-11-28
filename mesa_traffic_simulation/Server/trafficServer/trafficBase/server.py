@@ -46,7 +46,7 @@ with open('Server/trafficServer/trafficBase/city_files/2022_base.txt') as baseFi
     width = len(lines[0])-1
     height = len(lines)
 
-model_params = {"N":1}
+model_params = {"N":4}
 
 print(width, height)
 grid = CanvasGrid(agent_portrayal, width, height, 500, 500)

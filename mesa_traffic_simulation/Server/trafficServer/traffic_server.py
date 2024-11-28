@@ -1,5 +1,5 @@
 # TC2008B Sistemas Multiagentes y Gráficas Computacionales
-# Servidor de Python en Flask para comunicarse con WebGL
+# API de Python en Flask para comunicarse con WebGL
 
 # Simulación de Movilidad Urbana
 
@@ -11,7 +11,7 @@ from flask_cors import CORS, cross_origin
 from trafficBase.model import CityModel
 from trafficBase.agent import Road, Traffic_Light,Obstacle, Destination, Car
 
-number_agents = 10
+number_agents = 4
 width = 28
 height = 28
 cityModel = None
@@ -36,13 +36,13 @@ def initModel():
             print(request.json)
             print(f"Parámetros del modelo:{number_agents, width, height}")
 
-            cityModel = CityModel(number_agents, width, height)
+            cityModel = CityModel(number_agents)
 
             return jsonify({"message":"Parámetros recibidos. Iniciando simulación..."})
         
         except Exception as e:
-            print(e)
-            return jsonify({"message":"Error, inicializando el modelo"}), 500
+           print(e)
+           return jsonify({"message":"Error, inicializando el modelo"}), 500
         
 @app.route('/getCars', methods = ['GET'])
 @cross_origin()
@@ -52,10 +52,11 @@ def getCars():
     if request.method == 'GET':
         try:
             CarPositions = [
-                {"id": str(a.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id), "x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
-                if isinstance(a, Car)]
-            return jsonify({'posiciones de los autos': CarPositions})
+                for b in a
+                if isinstance(b, Car)]
+            return jsonify({'positions': CarPositions})
         
         except Exception as e:
             print(e)
@@ -70,10 +71,11 @@ def getObstacles():
     if request.method == 'GET':
         try:
             ObstaclePositions = [
-                {"id": str(a.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id),"x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
-                if isinstance(a, Obstacle)]
-            return jsonify({'posiciones de los autos': ObstaclePositions})
+                for b in a
+                if isinstance(b, Obstacle)]
+            return jsonify({'positions': ObstaclePositions})
         
         except Exception as e:
             print(e)
@@ -88,10 +90,11 @@ def getRoads():
     if request.method == 'GET':
         try:
             RoadPositions = [
-                {"id": str(a.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id),"x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
-                if isinstance(a, Road)]
-            return jsonify({'posiciones de los autos': RoadPositions})
+                for b in a
+                if isinstance(b, Road)]
+            return jsonify({'positions': RoadPositions})
         
         except Exception as e:
             print(e)
@@ -107,10 +110,11 @@ def getTrafficLight():
     if request.method == 'GET':
         try:
             TrafficLightPositions = [
-                {"id": str(a.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id), "x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
-                if isinstance(a, Traffic_Light)]
-            return jsonify({'posiciones de los autos': TrafficLightPositions})
+                for b in a
+                if isinstance(b, Traffic_Light)]
+            return jsonify({'positions': TrafficLightPositions})
         
         except Exception as e:
             print(e)
@@ -125,10 +129,11 @@ def getDestination():
     if request.method == 'GET':
         try:
             DestinationPositions = [
-                {"id": str(a.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id), "x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
-                if isinstance(a, Destination)]
-            return jsonify({'posiciones de los autos': DestinationPositions})
+                for b in a
+                if isinstance(b, Destination)]
+            return jsonify({'positions': DestinationPositions})
         
         except Exception as e:
             print(e)
