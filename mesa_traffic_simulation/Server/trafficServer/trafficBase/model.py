@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from trafficBase.agent import *
+from agent import *
 import random
 import json
 
@@ -115,7 +115,7 @@ class CityModel(Model):
     def __init__(self, N):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
-        dataDictionary = json.load(open('Server/trafficServer/trafficBase/city_files/mapDictionary.json'))
+        dataDictionary = json.load(open('city_files/mapDictionary.json'))
         self.graph = graph
         self.traffic_lights = []
         self.destinations = []
@@ -125,11 +125,7 @@ class CityModel(Model):
         self.cars_reached_destination = 0
 
         # Load the map file. The map file is a text file where each character represents an agent.
-<<<<<<< HEAD:mesa_traffic_simulation/Server/trafficServer/trafficBase/model.py
-        with open('Server/trafficServer/trafficBase/city_files/2022_base.txt') as baseFile:
-=======
         with open('city_files/2024_base.txt') as baseFile:
->>>>>>> 20fc6f9c81380e7ebdf07a01e5e4a015f9bef331:mesa_traffic_simulation/model.py
             lines = baseFile.readlines()
             self.width = len(lines[0])-1
             self.height = len(lines)

@@ -1,5 +1,5 @@
 from mesa import Agent
-from trafficBase.a_star import a_star_graph
+from a_star import a_star_graph
 
 direction_map = {
             # Direcciónes desde A

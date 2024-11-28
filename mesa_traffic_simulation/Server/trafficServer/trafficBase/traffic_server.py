@@ -8,8 +8,8 @@
 
 from flask import  Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from trafficBase.model import CityModel
-from trafficBase.agent import Road, Traffic_Light,Obstacle, Destination, Car
+from model import CityModel
+from agent import Road, Traffic_Light,Obstacle, Destination, Car
 
 number_agents = 4
 width = 28

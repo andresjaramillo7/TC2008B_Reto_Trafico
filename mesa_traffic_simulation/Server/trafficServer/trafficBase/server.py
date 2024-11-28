@@ -41,11 +41,7 @@ def agent_portrayal(agent):
 width = 0
 height = 0
 
-<<<<<<< HEAD:mesa_traffic_simulation/Server/trafficServer/trafficBase/server.py
-with open('Server/trafficServer/trafficBase/city_files/2022_base.txt') as baseFile:
-=======
 with open('city_files/2024_base.txt') as baseFile:
->>>>>>> 20fc6f9c81380e7ebdf07a01e5e4a015f9bef331:mesa_traffic_simulation/server.py
     lines = baseFile.readlines()
     width = len(lines[0])-1
     height = len(lines)
