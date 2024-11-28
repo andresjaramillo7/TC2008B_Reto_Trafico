@@ -6,17 +6,33 @@ import random
 import json
 
 graph = {
-    'A': ['a','B','F'],
-    'B': ['G','F'],
-    'C': ['B','b', 'A'],
-    'D': ['c', 'd', 'C', 'A'],
-    'E': ['D', 'A'],
-    'F': ['G', 'l', 'K'],
-    'G': ['H', 'e', 'j', 'K'],
-    'H': ['I'],
-    'I': ['E', 'g', 'i', 'h'],
-    'J': ['i', 'h', 'E', 'f', 'H'],
-    'K': ['m', 'h', 'E', 'k', 'J'],
+    'A': ['a', 'B', 'D'],
+    'B': ['C', 'M'],
+    'C': ['B', 'D', 'c'],
+    'D': ['E', 'I'],
+    'E': ['A', 'd', 'f', 'J'],
+    'H': ['e', 'C', 'M'],
+    'I': ['N', 'g', 'H'],
+    'J': ['I', 'E'],
+    'K': ['J', 'Z'],
+    'L': ['K', 'Z'],
+    'M': ['N', 'W'],
+    'N': ['O', 'k', 'R'],
+    'O': ['h', 'J', 'i', 'L'],
+    'P': ['O', 'i', 'L'],
+    'Q': ['L', 'p', 'm', 'j', 'P'],
+    'R': ['l', 'W', 'Y'],
+    'T': ['q', 'U'],
+    'U': ['$', 'n', '!'],
+    'X': ['Q', 'x', 'Ñ'],
+    '%': ['&', 'T', 'O'],
+    '$': ['X', '%'],
+    '!': ['o', 'Q', 'm', 'j', 'P'],
+    'Ñ': ['ñ', '$', 'X', '!'],
+    'Y': ['X', '&'],
+    'W': ['w', 'Y', 'u'],
+    'Z': ['b', 'J', 'f', 'A'],
+    '&': ['T', 'O'],
     'a': [],
     'b': [],
     'c': [],
@@ -29,23 +45,64 @@ graph = {
     'j': [],
     'k': [],
     'l': [],
-    'm': []
+    'm': [],
+    'n': [],
+    'o': [],
+    'p': [],
+    'q': [],
+    'u': [],
+    'w': [],
+    'x': [],
+    'ñ': [],
+    'n': [],
 }
 
 destination_positions = {
-    'a': (19, 1),
-    'b': (13, 4),
-    'c': (6, 4),
-    'd': (10, 8),
-    'e': (17, 14),
-    'f': (13, 15),
-    'g': (6, 15),
-    'h': (1, 15),
-    'i': (3, 18),
-    'j': (17, 20),
-    'k': (13, 20),
-    'l': (22, 22),
-    'm': (3, 23)
+    'a': (25, 1),
+    'b': (7, 4),
+    'c': (18, 6),
+    'd': (9, 7),
+    'e': (21, 10),
+    'f': (7, 10),
+    'g': (21, 13),
+    'h': (11, 15),
+    'i': (7, 18),
+    'j': (7, 20),
+    'k': (16, 20),
+    'l': (25, 22),
+    'm': (6, 18),
+    'o': (3, 22),
+    'p': (3, 20),
+    'q': (9, 22),
+    'u': (22, 28),
+    'w': (22, 26),
+    'x': (3, 25),
+    'ñ': (6, 25),
+    'n': (6, 22),
+}
+
+final_positions = {
+    'a': (25, 2),
+    'b': (8, 4),
+    'c': (18, 5),
+    'd': (9, 8),
+    'e': (20, 10),
+    'f': (8, 10),
+    'g': (21, 14),
+    'h': (10, 15),
+    'i': (7, 19),
+    'j': (7, 19),
+    'k': (17, 20),
+    'l': (25, 21),
+    'm': (6, 21),
+    'o': (3, 21),
+    'p': (3, 21),
+    'q': (9, 23),
+    'u': (22, 27),
+    'w': (22, 27),
+    'x': (3, 24),
+    'ñ': (6, 26),
+    'n': (6, 21),
 }
 
 class CityModel(Model):
@@ -63,12 +120,20 @@ class CityModel(Model):
         self.traffic_lights = []
         self.destinations = []
         self.destination_positions = destination_positions
+        self.final_positions = final_positions
+        self.total_cars_spawned = 0
+        self.cars_reached_destination = 0
 
         # Load the map file. The map file is a text file where each character represents an agent.
+<<<<<<< HEAD:mesa_traffic_simulation/Server/trafficServer/trafficBase/model.py
         with open('Server/trafficServer/trafficBase/city_files/2022_base.txt') as baseFile:
+=======
+        with open('city_files/2024_base.txt') as baseFile:
+>>>>>>> 20fc6f9c81380e7ebdf07a01e5e4a015f9bef331:mesa_traffic_simulation/model.py
             lines = baseFile.readlines()
             self.width = len(lines[0])-1
             self.height = len(lines)
+            print("width: ", self.width, "height: ", self.height)
 
             self.grid = MultiGrid(self.width, self.height, torus = False) 
             self.schedule = RandomActivation(self)
@@ -76,8 +141,11 @@ class CityModel(Model):
             # Goes through each character in the map file and creates the corresponding agent.
             for r, row in enumerate(lines):
                 for c, col in enumerate(row):
-                    if col in ["v", "^", ">", "<", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
-                               "K", "a", "b","c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]:
+                    if col in ["v", "^", ">", "<", "A", "B", "C", "D", "E", "H", "I", "J",
+                               "K", "L", "M", "N", "O", "P", "Q", "R", "T", "U", "!", "W", "%",
+                               "$", "Ñ", "X", "Y", "&", "Z", "a", "b", "c", "d", "e", "f", "g",
+                               "h", "i", "j", "k", "l", "m", "o", "p", "q", "u", "w", "x", "ñ",
+                               "n"]:
                         agent = Road(f"r_{r*self.width+c}", self, dataDictionary[col])
                         self.grid.place_agent(agent, (c, self.height - r - 1))
 
@@ -103,30 +171,35 @@ class CityModel(Model):
         
         for i in range(self.num_agents):
             pos = [(0, 0), (0, self.height - 1), (self.width - 1, 0), (self.width - 1, self.height - 1)]
-            initial_node = ["A", "E", "F", "K"]
-            a = Car(self.next_id, self, graph = self.graph, start_node = initial_node[i], destination_mapping = self.destination_positions)
+            initial_node = ["Z", "X", "B", "Y"]
+            a = Car(self.next_id, self, graph = self.graph, start_node = initial_node[i], destination_mapping = self.destination_positions, destination = self.final_positions)
             
-            a.destination = random.choice(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]) # Asigna un destino aleatorio
+            # a.destination = "m"
+            a.destination = random.choice(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "o", "p", "q", "u", "w", "x", "ñ", "n"]) # Asigna un destino aleatorio
             print(f"Auto {self.next_id} creado con destino {a.destination}")
             
             self.next_id += 1
             self.schedule.add(a)
             self.grid.place_agent(a, pos[i])
+            self.total_cars_spawned += 1
 
 
     def step(self):
         '''Advance the model by one step.'''
+        print("Cars Spawned: ", self.total_cars_spawned)
+        print("Reached Destination: ", self.cars_reached_destination)
         self.current_step += 1
         if self.current_step % 10 == 0:
             for i in range(4):
                 pos = [(0, 0), (0, self.height - 1), (self.width - 1, 0), (self.width - 1, self.height - 1)]
-                initial_node = ["A", "E", "F", "K"]
-                a = Car(self.next_id, self, graph = self.graph, start_node = initial_node[i], destination_mapping = self.destination_positions)
+                initial_node = ["Z", "X", "B", "Y"]
+                a = Car(self.next_id, self, graph = self.graph, start_node = initial_node[i], destination_mapping = self.destination_positions, destination = self.final_positions)
                 
-                a.destination = random.choice(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]) # Asigna un destino aleatorio
+                a.destination = random.choice(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "o", "p", "q", "u", "w", "x", "ñ", "n"]) # Asigna un destino aleatorio
                 print(f"Auto {self.next_id} creado con destino {a.destination}")
                 
                 self.next_id += 1
                 self.schedule.add(a)
                 self.grid.place_agent(a, pos[i])
+                self.total_cars_spawned += 1
         self.schedule.step()

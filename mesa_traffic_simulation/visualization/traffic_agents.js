@@ -1,6 +1,6 @@
-'use strict'
+'use strict';
 
-import * as twgl from 'twgl.js'
+import * as twgl from 'twgl.js';
 import GUI from 'lil-gui';
 import { v3, m4 } from './starter_3D_lib.js';
 
@@ -11,32 +11,9 @@ import car from "../Server/trafficServer/Objects/cube_normals.obj?raw"
 import traffic_light from "../Server/trafficServer/Objects/cube_normals.obj?raw"
 import road from "../Server/trafficServer/Objects/cube_normals.obj?raw/"
 
-const vsGLSL = `#version 300 es
-in vec4 a_position;
-in vec4 a_color;
+import vsGLSL from "../Server/trafficServer/Shaders/vs_color.glsl?raw"
+import fsGLSL from "../Server/trafficServer/Shaders/fs_color.glsl?raw"
 
-uniform mat4 u_transforms;
-uniform mat4 u_matrix;
-
-out vec4 v_color;
-
-void main() {
-gl_Position = u_matrix * a_position;
-v_color = a_color;
-}
-`;
-
-const fsGLSL = `#version 300 es
-precision highp float;
-
-in vec4 v_color;
-
-out vec4 outColor;
-
-void main() {
-outColor = v_color;
-}
-`;
 
 const data  = {
     NAgents: 4,
@@ -99,9 +76,9 @@ const settings = {
         z: 0,
     },
     cameraPosition: {
-        x: 0,
-        y: 40,
-        z: 0.01,
+        x: 10,
+        y: 20,
+        z: 10,
     },
     lightPosition: {
         x:20,
@@ -165,10 +142,10 @@ class Road{
 
 const agent_server_uri = "http://localhost:8585/";
 let carros = [];
-let obstaculos = [];
-let calles = [];
+const obstaculos = [];
+const calles = [];
 let semaforos = [];
-let destinos = [];
+const destinos = [];
 
 let gl, programInfo, carArrays, obstacleArrays, trafficLightArrays, roadArrays
 
@@ -203,16 +180,18 @@ async function main(){
     Objects.road.vao = twgl.createVAOFromBufferInfo(gl, programInfo, Objects.road.bufferInfo);
     Objects.destination.vao = twgl.createVAOFromBufferInfo(gl, programInfo, Objects.destination.bufferInfo);
 
+    //console.log("Info de coche: ", Objects.car)
+
     setupUI();
 
     await initAgentsModel();
 
     await getCars();
-    await getObstacles();
+    /*await getObstacles();
     await getRoads();
     await getTrafficLights();
     await getDestination();
-
+*/
     await drawScene(gl, Objects);
 }
 
@@ -245,7 +224,7 @@ async function getCars(){
             console.log(result.positions)
 
                 for (const carro of result.positions){
-                    const newCarro = new Car(Car.id, [carro.x, carro.y, carro.z]);
+                    const newCarro = new Car(carro.id, [carro.x, carro.y, carro.z]);
                     carros.push(newCarro)
                 }
 
@@ -266,12 +245,14 @@ async function getObstacles() {
         if (response.ok){
             let result = await response.json()
 
+            if (obstaculos == 0){
             for (const obstacle of result.positions) {
                 const newObstacle = new Building(obstacle.id, [obstacle.x, obstacle.y, obstacle.z])
                 obstaculos.push(newObstacle)
             }
 
             console.log("Obstaculos: ", obstaculos)
+        }
         }
     } catch (error) {
         console.log(error)
@@ -286,12 +267,14 @@ async function getRoads() {
         if (response.ok){
             let result = await response.json()
 
+            if (calles == 0){
             for (const roads of result.positions) {
                 const newRoad = new Road(roads.id, [roads.x, roads.y, roads.z])
                 calles.push(newRoad)
             }
 
             console.log("Calles: ", calles)
+        }
         }
     } catch (error) {
         console.log(error)
@@ -325,16 +308,19 @@ async function getTrafficLights() { //must check
         if (response.ok){
             let result = await response.json()
 
-                semaforos = []
-                for (const semaforos of result.positions){
+            if (semaforos == 0){
+
+
+                for (const semaforo of result.positions){
                     const newSemaforo = new TrafficLight (
-                        semaforos.id,
-                        [semaforos.x, semaforos.y, semaforos.z],
+                        semaforo.id,
+                        [semaforo.x, semaforo.y, semaforo.z],
                         [0,0,0],
                         [1,1,1],
                         semaforos.state ? [0,1,0,1] : [1,0,0,1],
                     );
                     semaforos.push(newSemaforo)
+                }
                 }
 
                 console.log("Semaforos:", semaforos)
@@ -383,23 +369,24 @@ async function drawScene(gl, Objects) {
         settings.lightPosition.z
     );
 
-    let globalUniforms = {
-        u_viewWorldPosition: v3_cameraPosition,
+   let globalUniforms = {
+        
+        u_viewWorldPosition: [10,20,10],
         u_lightWorldPosition: v3_lightPosition,
         u_ambientLight: settings.ambientColor,
         u_diffuseLight: settings.diffuseColor,
         u_specularLight: settings.specularColor,
-    };
+    }; 
     twgl.setUniforms(programInfo, globalUniforms);
 
     const viewProjectionMatrix = setupWorldView(gl);
 
     //drawing agents
-    drawAgent(calles, Objects.road.vao, Objects.road.bufferInfo, viewProjectionMatrix);
-    drawAgent(obstaculos, Objects.building.vao, Objects.building.bufferInfo, viewProjectionMatrix);
-    //drawAgent(destinos, Objects.destination.vao, Objects.destination.BufferInfo, viewProjectionMatrix);
-    drawAgent(semaforos, Objects.traffic_light.vao, Objects.traffic_light.BufferInfo, viewProjectionMatrix);
-    drawAgent(carros, Objects.car.vao, Objects.car.BufferInfo, viewProjectionMatrix);
+    //drawAgent(calles, Objects.road.vao, Objects.road.bufferInfo, viewProjectionMatrix);
+    //drawAgent(obstaculos, Objects.building.vao, Objects.building.bufferInfo, viewProjectionMatrix);
+    //drawAgent(destinos, Objects.destination.vao, Objects.destination.bufferInfo, viewProjectionMatrix);
+    //drawAgent(semaforos, Objects.traffic_light.vao, Objects.traffic_light.bufferInfo, viewProjectionMatrix);
+    drawAgent(carros, Objects.car.vao, Objects.car.bufferInfo, viewProjectionMatrix);
     
     frameCount++;
 
@@ -418,20 +405,27 @@ function drawAgent(list, Vao, BufferInfo, viewProjectionMatrix){
 
     for (const agent of list){
 
-        const carro_trans = twgl.v3.create(...agent.position);
-        const carro_scale = twgl.v3.create(...agent.scale);
+        const trans = twgl.v3.create(...agent.position);
+        const scale = twgl.v3.create(...agent.scale);
+
+        let worldMatrix = twgl.m4.identity()
         
 
-        agent.matrix = twgl.m4.translate(m4.identity(), carro_trans);
+        agent.matrix = twgl.m4.translate(worldMatrix, trans);
         agent.matrix = twgl.m4.rotateX(agent.matrix, agent.rotation[0]);
         agent.matrix = twgl.m4.rotateY(agent.matrix, agent.rotation[1]);
         agent.matrix = twgl.m4.rotateZ(agent.matrix, agent.rotation[2]);
-        agent.matrix = twgl.m4.scale(agent.matrix, carro_scale);
+        agent.matrix = twgl.m4.scale(agent.matrix, scale);
+
+        let modelViewProjectionMatrix = m4.multiply(viewProjectionMatrix, worldMatrix)
+
 
         let uniforms = {
             u_matrix: agent.matrix,
             u_color: agent.color,
+            u_worldViewProjection: modelViewProjectionMatrix
         }
+
 
         twgl.setUniforms(programInfo, uniforms);
         twgl.drawBufferInfo(gl, BufferInfo);
@@ -441,22 +435,27 @@ function drawAgent(list, Vao, BufferInfo, viewProjectionMatrix){
 
 
 function setupWorldView(gl) {
-
     const fov = 45 * Math.PI / 180;
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
+    // Creando la matriz de proyección (sin cambios)
     const projectionMatrix = twgl.m4.perspective(fov, aspect, 1, 200);
-    const target = [data.width/2, 0, data.height/2];
-    //console.log(target)
+
+    // Definir el objetivo hacia el cual apunta la cámara (puedes cambiar esto si es necesario)
+    const target = [data.width / 2, 0, data.height / 2];
 
     const up = [0, 1, 0];
-    
-    const camPos = twgl.v3.create(settings.cameraPosition.x / 2, settings.cameraPosition.y, settings.cameraPosition.z / 2);
 
+    // Aquí estamos usando directamente la posición de la cámara sin desplazamientos adicionales
+    const camPos = twgl.v3.create(settings.cameraPosition.x, settings.cameraPosition.y, settings.cameraPosition.z);
+
+    // Creando la matriz de la cámara (posicionando la cámara en camPos y mirando hacia el objetivo)
     const cameraMatrix = twgl.m4.lookAt(camPos, target, up);
 
+    // La matriz de vista es la inversa de la matriz de la cámara
     const viewMatrix = twgl.m4.inverse(cameraMatrix);
 
+    // Multiplicamos la matriz de proyección por la matriz de vista
     const viewProjectionMatrix = twgl.m4.multiply(projectionMatrix, viewMatrix);
 
     return viewProjectionMatrix;
@@ -494,6 +493,12 @@ function setupUI() {
     lightFolder.add(settings.lightPosition, 'x', -20, 20).decimals(2)
     lightFolder.add(settings.lightPosition, 'y', -20, 30).decimals(2)
     lightFolder.add(settings.lightPosition, 'z', -20, 20).decimals(2)
+
+    lightFolder.addColor(settings, 'ambientColor')
+    lightFolder.addColor(settings, 'diffuseColor')
+    lightFolder.addColor(settings, 'specularColor')
+
+
 
 }
 

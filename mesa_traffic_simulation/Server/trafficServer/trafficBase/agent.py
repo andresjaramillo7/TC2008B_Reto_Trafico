@@ -3,67 +3,143 @@ from trafficBase.a_star import a_star_graph
 
 direction_map = {
             # Direcciónes desde A
-            ("A", "B"): "Up",
-            ("A", "F"): "Right",
+            ("A", "B"): "Right",
+            ("A", "D"): "Up",
             ("A", "a"): "Right",
             
             # Direcciónes desde B
-            ("B", "G"): "Up",
-            ("B", "F"): "Right",
+            ("B", "C"): "Left",
+            ("B", "M"): "Up",
             
             # Direcciónes desde C
-            ("C", "B"): "Right",
-            ("C", "b"): "Down",
-            ("C", "A"): "Down",
+            ("C", "c"): "Left",
+            ("C", "B"): "Down",
+            ("C", "D"): "Left",
+            ("C", "a"): "Down",
             
             # Direcciónes desde D
-            ("D", "c"): "Down",
-            ("D", "d"): "Right",
-            ("D", "C"): "Right",
-            ("D", "A"): "Down",
+            ("D", "E"): "Left",
+            ("D", "I"): "Up",
             
             # Direcciónes desde E
-            ("E", "D"): "Right",
             ("E", "A"): "Down",
-            
-            # Direcciónes desde F
-            ("F", "G"): "Left",
-            ("F", "l"): "Up",
-            ("F", "K"): "Up",
-            
-            # Direcciónes desde G
-            ("G", "H"): "Left",
-            ("G", "e"): "Up",
-            ("G", "j"): "Up",
-            ("G", "K"): "Up",
+            ("E", "d"): "Left",
+            ("E", "f"): "Left",
+            ("E", "J"): "Left",
             
             # Direcciónes desde H
-            ("H", "I"): "Left",
+            ("H", "e"): "Down",
+            ("H", "C"): "Down",
+            ("H", "M"): "Right",
             
             # Direcciónes desde I
-            ("I", "E"): "Left",
-            ("I", "g"): "Up",
-            ("I", "i"): "Up",
-            ("I", "h"): "Up",
+            ("I", "N"): "Up",
+            ("I", "g"): "Right",
+            ("I", "H"): "Right",
             
             # Direcciónes desde J
-            ("J", "i"): "Left",
-            ("J", "h"): "Left",
-            ("J", "E"): "Left",
-            ("J", "f"): "Down",
-            ("J", "H"): "Down",
+            ("J", "I"): "Right",
+            ("J", "E"): "Down",
             
             # Direcciónes desde K
-            ("K", "m"): "Left",
-            ("K", "h"): "Left",
-            ("K", "E"): "Left",
-            ("K", "k"): "Down",
-            ("K", "J"): "Down",
+            ("K", "J"): "Right",
+            ("K", "Z"): "Down",
             
+            # Direcciones desde L
+            ("L", "K"): "Right",
+            ("L", "Z"): "Down",
+            
+            # Direcciones desde M
+            ("M", "N"): "Left",
+            ("M", "W"): "Up",
+            
+            # Direcciones desde N
+            ("N", "O"): "Left",
+            ("N", "k"): "Up",
+            ("N", "R"): "Up",
+            
+            # Direcciones desde O
+            ("O", "h"): "Down",
+            ("O", "J"): "Down",
+            ("O", "i"): "Left",
+            ("O", "L"): "Left",
+            
+            # Direcciones desde P
+            ("P", "O"): "Right",
+            ("P", "i"): "Down",
+            ("P", "L"): "Down",
+            
+            # Direcciones desde Q
+            ("Q", "L"): "Down",
+            ("Q", "p"): "Right",
+            ("Q", "m"): "Right",
+            ("Q", "j"): "Right",
+            ("Q", "P"): "Right",
+            
+            # Direcciones desde R
+            ("R", "l"): "Right",
+            ("R", "W"): "Right",
+            ("R", "Y"): "Up",
+            
+            # Direcciones desde T
+            ("T", "q"): "Left",
+            ("T", "U"): "Left",
+            
+            # Direcciones desde U
+            ("U", "$"): "Up",
+            ("U", "n"): "Left",
+            ("U", "!"): "Left",
+            
+            # Direcciones desde X
+            ("X", "Q"): "Down",
+            ("X", "x"): "Right",
+            ("X", "Ñ"): "Right",
+            
+            # Direcciones desde %
+            ("%", "&"): "Right",
+            ("%", "T"): "Down",
+            ("%", "O"): "Right",
+            
+            # Direcciones desde $
+            ("$", "X"): "Up",
+            ("$", "%"): "Right",
+            
+            # Direcciones desde !
+            ("!", "o"): "Left",
+            ("!", "Q"): "Left",
+            ("!", "m"): "Down",
+            ("!", "j"): "Down",
+            ("!", "P"): "Down",
+            
+            # Direcciones desde Ñ
+            ("Ñ", "ñ"): "Right",
+            ("Ñ", "$"): "Right",
+            ("Ñ", "X"): "Up",
+            ("Ñ", "!"): "Down",
+            
+            # Direcciones desde Y
+            ("Y", "X"): "Left",
+            ("Y", "&"): "Down",
+            
+            # Direcciones desde W
+            ("W", "w"): "Left",
+            ("W", "Y"): "Up",
+            ("W", "u"): "Up",
+            ("W", "Y"): "Left",
+            
+            # Direcciones desde Z
+            ("Z", "b"): "Up",
+            ("Z", "f"): "Up",
+            ("Z", "A"): "Right",
+            ("Z", "J"): "Up",
+            
+            # Direcciones desde &
+            ("&", "T"): "Left",
+            ("&", "O"): "Down",
         }
 
 class Car(Agent):
-    def __init__(self, unique_id, model, graph, start_node, destination_mapping):
+    def __init__(self, unique_id, model, graph, start_node, destination_mapping, destination):
         super().__init__(unique_id, model)
         self.waiting_at_light = False  # Flag para manejar semáforos
         self.last_direction = None  # Guarda la última dirección válida
@@ -76,6 +152,7 @@ class Car(Agent):
         self.graph = graph
         self.initial_node = start_node
         self.destination_mapping = destination_mapping
+        self.final_destination_verification = destination
     
     def calculate_route(self):
         """Calcula la ruta desde el nodo inicial hasta el destino."""
@@ -126,7 +203,8 @@ class Car(Agent):
 
         # Verificar si el agente ya está al lado del Destination
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
-        looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)]
+        looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)
+                               and pos == self.final_destination_verification.get(self.destination)]
 
         # Si está al lado del Destination
         if looking_destination:
@@ -183,6 +261,7 @@ class Car(Agent):
         # Mover al auto
         print(f"Car {self.unique_id}: Moving from {self.pos} to {next_pos}.")
         self.model.grid.move_agent(self, next_pos)
+
         
     def get_previous_direction(self):
         """
@@ -212,6 +291,18 @@ class Car(Agent):
             self.move_towards_final_destination()
             print(f"Car {self.unique_id}: Moving towards final destination.")
             return
+        
+        # neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
+        # looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)
+        #                        and pos == self.final_destination_verification.get(self.destination)]
+
+        # # Si está al lado del Destination
+        # if looking_destination:
+        #     dest_pos = looking_destination[0]  # Obtener la posición del Destination
+        #     print(f"Car {self.unique_id}: Moving to final destination ('?') at {dest_pos}.")
+        #     self.model.grid.move_agent(self, dest_pos)
+        #     return
+        
         # Filtra para encontrar el agente Road en la celda actual
         road_agent = next((a for a in self.model.grid.get_cell_list_contents(self.pos) if isinstance(a, Road)), None)
         direction = road_agent.direction if road_agent else None
@@ -235,7 +326,8 @@ class Car(Agent):
             )
             if (
                 previous_road and isinstance(previous_road.direction, list)  # Vecino opuesto era una intersección
-                and not isinstance(direction, list)  # Dirección actual no es una lista (salió de la intersección)
+                and not isinstance(direction, list)
+                and not self.waiting_at_light# Dirección actual no es una lista (salió de la intersección)
             ):
                 print(f"Car {self.unique_id}: Exiting intersection. Consuming route direction.")
                 if self.route:
@@ -245,6 +337,7 @@ class Car(Agent):
         # Si la dirección es una lista (intersección), obtén las opciones
         if isinstance(direction, list):
             print(f"Car {self.unique_id}: At intersection {self.pos} with options {direction}")
+    
             # Elegir dirección basándose en el destino
             if self.destination:  # Si el auto tiene un destino
                 direction = self.choose_direction_based_on_route(direction)
@@ -305,6 +398,7 @@ class Car(Agent):
             print(f"Car {self.unique_id}: Reached final destination at {self.pos}. Removing from map.")
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
+            self.model.cars_reached_destination += 1
             return
         if not self.route and not self.route_calculated:
             self.calculate_route()
