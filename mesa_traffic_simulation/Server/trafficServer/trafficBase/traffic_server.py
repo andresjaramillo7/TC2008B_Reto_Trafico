@@ -52,7 +52,7 @@ def getCars():
     if request.method == 'GET':
         try:
             CarPositions = [
-                {"id": str(b.unique_id), "x": x, "y": 0, "z": z}
+                {"id": str(b.unique_id), "x": x, "y": 1, "z": z}
                 for a, (x,z) in cityModel.grid.coord_iter()
                 for b in a
                 if isinstance(b, Car)]
@@ -110,7 +110,7 @@ def getTrafficLight():
     if request.method == 'GET':
         try:
             TrafficLightPositions = [
-                {"id": str(b.unique_id), "x": x, "y": 1, "z": z}
+                {"id": str(b.unique_id), "x": x, "y": 3, "z": z, "condition": b.state}
                 for a, (x,z) in cityModel.grid.coord_iter()
                 for b in a
                 if isinstance(b, Traffic_Light)]
