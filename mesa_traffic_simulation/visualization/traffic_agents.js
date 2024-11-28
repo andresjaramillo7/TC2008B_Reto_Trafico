@@ -116,6 +116,18 @@ class Building{
     }
 }
 
+class Destination{
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.2,0.5]){
+        this.id = id;
+        this.position = position;
+        this.rotation = rotation;
+        this.scale = scale;
+        this.color = Objects.destination.model.color;
+        this.shininess = Objects.destination.model.shininess;
+        this.matrix = m4.identity();
+    }
+}
+
 class TrafficLight{
     constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.1,0.1,0.1]){
         this.id = id;
@@ -307,7 +319,7 @@ async function getDestination() {
             let result = await response.json()
 
             for (const destinations of result.positions) {
-                const newDestination = new Building(destinations.id, [destinations.x, destinations.y, destinations.z])
+                const newDestination = new Destination(destinations.id, [destinations.x, destinations.y, destinations.z])
                 destinos.push(newDestination)
             }
 
@@ -334,7 +346,7 @@ async function getTrafficLights() { //must check
                         [0,0,0],
                         [0.2,0.2,0.2],
                     );
-                    newSemaforo.color = semaforos.state ? [0,1,0,1] : [1,0,0,1]
+                    newSemaforo.color = semaforo.state ? [0,1,0,1] : [1,0,0,1]
                     semaforos.push(newSemaforo)
                 } 
 
@@ -352,7 +364,7 @@ async function update(){
         if (response.ok){
             await getCars()
             await getTrafficLights()
-            console.log("Agentes actualizados")
+            //console.log("Agentes actualizados")
         }
     } catch (error){
         console.log(error)
@@ -442,7 +454,7 @@ function drawAgent(list, Vao, BufferInfo, viewProjectionMatrix){
         }
 
         if (agent.state != undefined){
-            uniforms.u_color = agent.state
+            uniforms.u_color = agent.color
             
         }
 
