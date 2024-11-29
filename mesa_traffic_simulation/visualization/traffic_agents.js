@@ -93,19 +93,19 @@ const settings = {
 
 
 class Car{
-    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.2,0.2,0.2]){
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.2,0.2,0.2], color = [Math.random(), Math.random(), Math.random(), 1]){
         this.id = id;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
-        this.color = Objects.car.model.color;
+        this.color = color;
         this.shininess = Objects.car.model.shininess;
         this.matrix = m4.identity();
     }
 }
 
 class Building{
-    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,0.5], color = [Math.random(), Math.random(), Math.random(), 1]){
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,0.5], color = [0.3, 0.3, 0.3, 1]){
         this.id = id;
         this.position = position;
         this.rotation = rotation;
