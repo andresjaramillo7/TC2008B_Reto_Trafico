@@ -1,6 +1,6 @@
 from agent import *
 from model import CityModel
-from mesa.visualization import CanvasGrid, BarChartModule
+from mesa.visualization import CanvasGrid
 from mesa.visualization import ModularServer
 
 def agent_portrayal(agent):

@@ -1,6 +1,7 @@
 from mesa import Agent
 from a_star import a_star_graph
 
+# This map is used to determine the direction of the graph's nodes and the direction they have to take to reach the next node.
 direction_map = {
             # Direcciónes desde A
             ("A", "B"): "Right",
@@ -139,85 +140,95 @@ direction_map = {
         }
 
 class Car(Agent):
+    """
+        Car agent. Represents a car moving through the city, it calculates the route to the destination and follows the city's rules.
+        
+        Args:
+            unique_id: The agent's ID
+            model: Model reference for the agent
+            graph: Graph representation of the city's intersections and connection between them.
+            start_node: The node where the car starts
+            destination_mapping: The mapping of the destination to the grid position
+            destination: The destination of the car
+    """
     def __init__(self, unique_id, model, graph, start_node, destination_mapping, destination):
         super().__init__(unique_id, model)
-        self.waiting_at_light = False  # Flag para manejar semáforos
-        self.last_direction = None  # Guarda la última dirección válida
-        self.destination = None  # Guarda la posición de destino
-        self.at_intersection = False
-        self.reaching_destination = False
-        self.route_calculated = False
-        self.final_destination = None
-        self.route = []
-        self.graph = graph
-        self.initial_node = start_node
-        self.destination_mapping = destination_mapping
-        self.final_destination_verification = destination
+        self.waiting_at_light = False  # Flag to indicate if the car is waiting at a red light
+        self.last_direction = None  # Saves the last valid direction the car took
+        self.destination = None  # Closest point to the destination
+        self.at_intersection = False # Flag to indicate if the car is at an intersection
+        self.reaching_destination = False # Flag to indicate if the car is reaching the destination
+        self.route_calculated = False # Flag to indicate if the route has been calculated
+        self.final_destination = None # Final destination of the car
+        self.route = [] # Route to the destination
+        self.graph = graph # City's graph
+        self.initial_node = start_node # Initial node of the car
+        self.destination_mapping = destination_mapping # Mapping of the destination to the grid position
+        self.final_destination_verification = destination # Final Destination's position of the car
     
     def calculate_route(self):
-        """Calcula la ruta desde el nodo inicial hasta el destino."""
-        path = a_star_graph(self.graph, self.initial_node, self.destination)  # Ruta como lista de nodos
-        print(f"Car {self.unique_id}: Calculated path: {path}")
+        """Calculates the route to the destination using the A* algorithm."""
+        path = a_star_graph(self.graph, self.initial_node, self.destination)  # Route as a list of nodes
 
-        # Convertir la ruta de nodos en direcciones
+        # Converts the path to a list of directions
         self.route = []
         for i in range(len(path) - 1):
             current, next_node = path[i], path[i + 1]
             direction = direction_map.get((current, next_node), None)
             self.route.append(direction)
-        print(f"Car {self.unique_id}: Route: {self.route}")
         
     def choose_direction_based_on_route(self, options):
         """
-        Decide la dirección basándose en la lista predefinida de direcciones (self.route).
+            Gives the car the direction to take based on the route to the destination.
+            
+            Args:
+                options: The possible directions the car can take.
         """
         if not self.route:
-            return None  # Si no hay más direcciones, no se toma ninguna decisión
+            return None  # If there are no directions in the route, return None
 
-        next_direction = self.route[0]  # Obtener la próxima dirección de la ruta
+        next_direction = self.route[0]  # Obtains the next direction from the route
 
-        # Verificar si la próxima dirección está disponible en las opciones de la intersección
+        # Verifies if the next direction is in the options
         if next_direction in options:
             return next_direction
 
-        print(f"Car {self.unique_id}: Next direction {next_direction} not available in options {options}.")
-        return None  # Si la próxima dirección no está en las opciones, no hacer nada
+        return None  # If the next direction is not in the options, return None
 
     def contains_destination(self, pos):
-        """Checks if there is any trash in the specified grid cell.
+        """Checks if there is a Destination agent in the given position.
 
         Args:
-            pos: The grid position to check for trash.
+            pos: The position to check for Destination agents.
         """
         items = self.model.grid.get_cell_list_contents([pos])
         return any(isinstance(item, Destination) for item in items)
 
     def move_towards_final_destination(self):
         """
-        Mueve el auto hacia las coordenadas de self.final_destination.
-        Cuando llega al lado de la celda de Destination, se mueve hacia esa celda y se elimina.
+            When the car is reaching the destination, it moves towards the final destination.
         """
+        # Verifies if the final destination is set
         if not self.final_destination:
-            print(f"Car {self.unique_id}: Final destination not set. Cannot move.")
             return
 
-        # Verificar si el agente ya está al lado del Destination
+        # Verifies if the car is near the final destination
         neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
         looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)
                                and pos == self.final_destination_verification.get(self.destination)]
 
-        # Si está al lado del Destination
+        # If the car is near the final destination then move to the final destination
         if looking_destination:
-            dest_pos = looking_destination[0]  # Obtener la posición del Destination
+            dest_pos = looking_destination[0]
             print(f"Car {self.unique_id}: Moving to final destination ('?') at {dest_pos}.")
             self.model.grid.move_agent(self, dest_pos)
             return
 
-        # Si no está al lado del Destination, moverse hacia self.final_destination
+        # If the car is not near the final destination, then move towards the final destination
         current_x, current_y = self.pos
         target_x, target_y = self.final_destination
 
-        # Calcular la dirección basada en las coordenadas
+        # Calculates the direction to move
         if current_x < target_x:
             direction = "Right"
         elif current_x > target_x:
@@ -227,11 +238,9 @@ class Car(Agent):
         elif current_y > target_y:
             direction = "Up"
         else:
-            # Ya está en la posición final
-            print(f"Car {self.unique_id}: Reached the position near the final destination at {self.pos}.")
             return
 
-        # Calcular la posición siguiente
+        # Calculates the next position
         if direction == "Right":
             next_pos = (current_x + 1, current_y)
         elif direction == "Left":
@@ -241,32 +250,31 @@ class Car(Agent):
         elif direction == "Up":
             next_pos = (current_x, current_y - 1)
 
-        # Verificar si hay semáforo en la posición siguiente
+        # Verifies if there is a Traffic Light in the next position
         next_cell_agents = self.model.grid.get_cell_list_contents(next_pos)
         traffic_light = next((a for a in next_cell_agents if isinstance(a, Traffic_Light)), None)
 
+        # If there is a Traffic Light in the next position then wait
         if traffic_light:
-            if not traffic_light.state:  # Semáforo en rojo
-                print(f"Car {self.unique_id}: Waiting at red light at {next_pos}")
-                self.waiting_at_light = True
+            if not traffic_light.state:  # If the Traffic Light is red
+                self.waiting_at_light = True # Set the waiting_at_light flag to True
                 return
             else:
-                self.waiting_at_light = False
+                self.waiting_at_light = False # Set the waiting_at_light flag to False
 
-        # Verificar si la celda está ocupada por otro auto
+        # Verifies if there is a Car in the next position
         if any(isinstance(a, Car) for a in next_cell_agents):
-            print(f"Car {self.unique_id}: Next position {next_pos} is occupied by another car.")
-            return  # No avanzar si está ocupado
+            return  # If there is a Car in the next position then don't move
 
-        # Mover al auto
-        print(f"Car {self.unique_id}: Moving from {self.pos} to {next_pos}.")
+        # Moves the car to the next position
         self.model.grid.move_agent(self, next_pos)
 
         
     def get_previous_direction(self):
         """
-        Busca la dirección válida en las celdas detrás del auto.
+            Obtains the previous direction the car took.
         """
+        # Map of the last neighbor based on the last direction
         directions = {
             "Right": (-1, 0),
             "Left": (1, 0),
@@ -274,39 +282,46 @@ class Car(Agent):
             "Up": (0, -1),
         }
 
+        # Verifies if the last direction is valid
         if not self.last_direction or self.last_direction not in directions:
             return None 
 
-        # Calcula la celda detrás del auto
+        # Obtains the previous position
         dx, dy = directions[self.last_direction]
         previous_pos = (self.pos[0] + dx, self.pos[1] + dy)
         previous_road = next(
             (a for a in self.model.grid.get_cell_list_contents(previous_pos) if isinstance(a, Road)),
             None
         )
-        return previous_road.direction if previous_road else None
+        return previous_road.direction if previous_road else None # Returns the previous direction
     
     def move(self):
+        """
+            Moves the car through the city. It follows the city's rules and the route to the destination.
+        """
+        # Verifies if the car is reaching the destination
         if self.reaching_destination:
             self.move_towards_final_destination()
             print(f"Car {self.unique_id}: Moving towards final destination.")
             return
         
-        # neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
-        # looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)
-        #                        and pos == self.final_destination_verification.get(self.destination)]
+        # Verifies if the car is near the final destination
+        neighborhood = self.model.grid.get_neighborhood(self.pos, moore=False, include_center=False)
+        looking_destination = [pos for pos in neighborhood if self.contains_destination(pos)
+                               and pos == self.final_destination_verification.get(self.destination)]
 
-        # # Si está al lado del Destination
-        # if looking_destination:
-        #     dest_pos = looking_destination[0]  # Obtener la posición del Destination
-        #     print(f"Car {self.unique_id}: Moving to final destination ('?') at {dest_pos}.")
-        #     self.model.grid.move_agent(self, dest_pos)
-        #     return
+        # If the car is near the final destination then move to the final destination
+        if looking_destination:
+            dest_pos = looking_destination[0]  # Obtener la posición del Destination
+            print(f"Car {self.unique_id}: Moving to final destination ('?') at {dest_pos}.")
+            self.model.grid.move_agent(self, dest_pos)
+            return
         
-        # Filtra para encontrar el agente Road en la celda actual
+        # Filters the agents in the next position
         road_agent = next((a for a in self.model.grid.get_cell_list_contents(self.pos) if isinstance(a, Road)), None)
         direction = road_agent.direction if road_agent else None
         
+        # Verifies if the car is at an intersection 
         last_neighbor_map = {
         "Right": (-1, 0),
         "Left": (1, 0),
@@ -315,39 +330,38 @@ class Car(Agent):
         }
         
         opposite_neighbor = None
+        # If the last direction is in the last neighbor map then obtain the opposite neighbor
         if self.last_direction in last_neighbor_map:
             dx, dy = last_neighbor_map[self.last_direction]
             opposite_neighbor = (self.pos[0] + dx, self.pos[1] + dy)
 
-        # Verificar si el vecino opuesto era una intersección y el actual no lo es
+        # Verifies if the car is at an intersection and the opposite neighbor is a Road to consume the route direction
         if opposite_neighbor:
             previous_road = next(
                 (a for a in self.model.grid.get_cell_list_contents(opposite_neighbor) if isinstance(a, Road)), None
             )
+            # If the opposite neighbor is a Road with a list direction and the car is not waiting at a red light
             if (
-                previous_road and isinstance(previous_road.direction, list)  # Vecino opuesto era una intersección
-                and not isinstance(direction, list)
-                and not self.waiting_at_light# Dirección actual no es una lista (salió de la intersección)
+                previous_road and isinstance(previous_road.direction, list)  # Opposite neighbor is a Road with a list direction
+                and not isinstance(direction, list) # Current direction is not a list
+                and not self.waiting_at_light # Car is not waiting at a red light
             ):
-                print(f"Car {self.unique_id}: Exiting intersection. Consuming route direction.")
                 if self.route:
-                    self.route.pop(0)  # Consumir la dirección actual de la ruta
-                    print(f"Car {self.unique_id}: Route after pop: {self.route}")
+                    self.route.pop(0) # Consume the route direction
 
-        # Si la dirección es una lista (intersección), obtén las opciones
+        # If the car is at an intersection obtain the possible directions
         if isinstance(direction, list):
-            print(f"Car {self.unique_id}: At intersection {self.pos} with options {direction}")
     
-            # Elegir dirección basándose en el destino
-            if self.destination:  # Si el auto tiene un destino
+            # Chooose the direction based on the route
+            if self.destination:
                 direction = self.choose_direction_based_on_route(direction)
 
+        # If the car is not at an intersection then obtain the possible directions
         if not direction:
             # Si no encuentra una dirección, usa la última dirección válida o revisa detrás
-            print(f"Car {self.unique_id}: No direction found at {self.pos}, checking previous direction...")
             direction = self.get_previous_direction()
 
-        # Calcula la posición siguiente
+        # Calculates the next position based on the direction
         if direction == "Right":
             next_pos = (self.pos[0] + 1, self.pos[1])
         elif direction == "Left":
@@ -356,36 +370,36 @@ class Car(Agent):
             next_pos = (self.pos[0], self.pos[1] - 1)
         elif direction == "Up":
             next_pos = (self.pos[0], self.pos[1] + 1)
-        
-        print(f"Car {self.unique_id}: Trying to move from {self.pos} to {next_pos} (Direction: {direction})")
 
-        # Verificar si hay semáforo en la posición siguiente
+        # Verifies if the next position is a Traffic Light
         next_cell_agents = self.model.grid.get_cell_list_contents(next_pos)
         traffic_light = next((a for a in next_cell_agents if isinstance(a, Traffic_Light)), None)
-        if road_agent and not isinstance(road_agent.direction, list):
-            self.at_intersection = False
 
+        # If the next position is a Traffic Light then wait
         if traffic_light:
-            if not traffic_light.state:  # Semáforo en rojo
+            if not traffic_light.state:  # Traffic Light is red
                 print(f"Car {self.unique_id}: Waiting at red light at {next_pos}")
-                self.waiting_at_light = True
+                self.waiting_at_light = True # Set the waiting_at_light flag to True
                 return
             else:
-                self.waiting_at_light = False
+                self.waiting_at_light = False # Set the waiting_at_light flag to False
 
-        # Verificar si la celda está ocupada por otro auto
+        # Verifies if the next position is a Car
         if any(isinstance(a, Car) for a in next_cell_agents):
             print(f"Car {self.unique_id}: Next position {next_pos} is occupied")
-            return  # No avanzar si está ocupado
+            return  # If the next position is a Car then don't move
 
-        # Actualizar la última dirección válida antes de moverse
+        # Keep track of the last valid direction
         self.last_direction = direction
 
-        # Mover al auto
+        # Move the car to the next position
         self.model.grid.move_agent(self, next_pos)
         print(f"Car {self.unique_id}: Moved to {next_pos}")
 
     def step(self):
+        """
+            Advances the car by one step. It calculates the route to the destination and moves the car through the city.
+        """
         if self.final_destination is None:
             # Obtener la posición final basada en la letra del destino
             self.final_destination = self.destination_mapping.get(self.destination)
