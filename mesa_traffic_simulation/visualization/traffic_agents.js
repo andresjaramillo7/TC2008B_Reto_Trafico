@@ -91,7 +91,6 @@ const settings = {
 
 };
 
-
 class Car{
     constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.2,0.2,0.2], color = [Math.random(), Math.random(), Math.random(), 1]){
         this.id = id;
@@ -425,7 +424,7 @@ async function drawScene(gl, Objects) {
     
     frameCount++;
 
-    if(frameCount%30 == 0){
+    if(frameCount%20 == 0){
         frameCount = 0
         await update()
     }
