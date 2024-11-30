@@ -2,7 +2,7 @@
 // Create an .js file with the cylinder obj attributes
 // node load_objs.js [path]
 
-//Código inspirado en el trabajo de Ricardo Alfredo Calvo Perez - A01028889
+// Código inspirado en el trabajo de Ricardo Alfredo Calvo Perez - A01028889
 
 
 function load_obj(content) {

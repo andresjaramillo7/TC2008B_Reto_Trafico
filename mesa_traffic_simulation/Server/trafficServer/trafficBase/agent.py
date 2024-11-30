@@ -400,6 +400,7 @@ class Car(Agent):
         """
             Advances the car by one step. It calculates the route to the destination and moves the car through the city.
         """
+        # Verifies if the final destination is set if not then set it
         if self.final_destination is None:
             # Obtener la posición final basada en la letra del destino
             self.final_destination = self.destination_mapping.get(self.destination)
@@ -407,6 +408,8 @@ class Car(Agent):
             if self.final_destination is None:
                 print(f"Car {self.unique_id}: Final destination not found in mapping.")
                 return            
+        
+        # Verifies if the car has reached the final destination and removes it from the map
         cell_agents = self.model.grid.get_cell_list_contents(self.pos)
         if any(isinstance(agent, Destination) for agent in cell_agents):
             print(f"Car {self.unique_id}: Reached final destination at {self.pos}. Removing from map.")
@@ -414,17 +417,20 @@ class Car(Agent):
             self.model.schedule.remove(self)
             self.model.cars_reached_destination += 1
             return
+
+        # Verifies if the car has not calculated the route
         if not self.route and not self.route_calculated:
             self.calculate_route()
             self.route_calculated = True
             print(f"Car {self.unique_id}: Calculated route: {self.route}")
             
+        # Verifies if the car is about to reach the destination
         if not self.route and self.route_calculated:
             self.reaching_destination = True
             print(f"Car {self.unique_id}: Route is empty. Activating reaching_destination.")
         
         print(f"Car {self.unique_id}: Moving along route: {self.route}")
-        self.move()
+        self.move() # Move the car
 
 class Traffic_Light(Agent):
     """

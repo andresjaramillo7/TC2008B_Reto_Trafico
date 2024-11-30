@@ -209,7 +209,7 @@ class CityModel(Model):
                                                                                                             # the given parameters
                 a.destination = random.choice(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
                                             "l", "m","o", "p", "q", "u", "w", "x", "ñ", "n"]) # Assigns a random destination
-                
+
                 self.next_id += 1 # Increments the next id to create a unique id for each agent
                 self.schedule.add(a) # Adds the agent to the scheduler
                 self.grid.place_agent(a, pos[i]) # Places the agent in the grid

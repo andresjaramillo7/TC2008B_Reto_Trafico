@@ -11,13 +11,13 @@ def a_star_graph(graph, start, goal):
     # Inicializar estructuras de datos
     open_set = []  # Priority queue
     heapq.heappush(open_set, (0, start))  # (f_score, nodo)
-    
+
     came_from = {}  # Para reconstruir la ruta
     g_score = {node: float('inf') for node in graph}  # Costo del inicio al nodo
     g_score[start] = 0
     
     f_score = {node: float('inf') for node in graph}  # f(n) = g(n) + h(n)
-    f_score[start] = 0  # Suponiendo heurística cero para ahora (peso uniforme)
+    f_score[start] = 0  # Heurística opcional aquí
 
     while open_set:
         # Nodo con menor f_score
@@ -25,7 +25,6 @@ def a_star_graph(graph, start, goal):
         
         # Si alcanzamos el destino
         if current == goal:
-            # Reconstruir la ruta desde el destino al inicio
             route = []
             while current in came_from:
                 route.append(current)

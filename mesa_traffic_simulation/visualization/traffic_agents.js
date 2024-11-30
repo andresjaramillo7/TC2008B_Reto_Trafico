@@ -7,7 +7,7 @@ import { v3, m4 } from './starter_3D_lib.js';
 import { load_obj } from '../Server/trafficServer/load_obj.js'
 
 import building from "../Server/trafficServer/Objects/cube_normals.obj?raw"
-import car from "../Server/trafficServer/Objects/cube_normals.obj?raw"
+import car from "../Server/trafficServer/Objects/car.obj?raw"
 import traffic_light from "../Server/trafficServer/Objects/cube_normals.obj?raw"
 import road from "../Server/trafficServer/Objects/cube_normals.obj?raw/"
 
@@ -76,9 +76,9 @@ const settings = {
         z: 0,
     },
     cameraPosition: {
-        x: 17,
-        y: 50,
-        z: 30,
+        x: 15,
+        y: 40,
+        z: 20,
     },
     lightPosition: {
         x:20,
@@ -104,7 +104,7 @@ class Car{
 }
 
 class Building{
-    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,0.5], color = [0.3, 0.3, 0.3, 1]){
+    constructor(id, position = [0,0,0], rotation = [0,0,0], scale = [0.5,0.5,1], color = [0.3, 0.3, 0.3, 1]){
         this.id = id;
         this.position = position;
         this.rotation = rotation;
